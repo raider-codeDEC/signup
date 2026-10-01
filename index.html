@@ -23,7 +23,7 @@
   <noscript><p>This page needs JavaScript. Turn it on in your browser settings, then reload.</p></noscript>
   <script>
     // Paste the Families deployment address from Apps Script between the quotes. It ends in /exec.
-    var APP_URL = 'PASTE_THE_FAMILIES_URL_HERE';
+    var APP_URL = 'https://script.google.com/macros/s/AKfycbzdbKIyBF4t00SZnme8-Q8xuIgS1CiMtMPP-9aFPJF2nzvtIJlx_EPTizhKQT6uIXEU/exec';
 
     // Only an event code (e) or a family's private code (b) is passed along, stripped to safe characters.
     function clean(v) { return String(v || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64); }
