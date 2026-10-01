@@ -1,0 +1,60 @@
+<!doctype html>
+<!--
+  Friendly address for Rooms Sign-ups.
+  Host this ONE file on a district address such as https://signup.yourdistrict.org/ so families
+  never see the long script.google.com link. It is not part of the Apps Script project: don't paste
+  it into the script editor. Setup steps are in README.md ("A friendly web address").
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex">
+  <title>Raider Sign-ups</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0B0B0C; }
+    iframe { display: block; width: 100%; height: 100vh; height: 100dvh; border: 0; background: #F7F8FA; }
+    p { color: #fff; font: 17px/1.5 system-ui, sans-serif; padding: 24px; margin: 0; }
+  </style>
+</head>
+<body>
+  <iframe id="app" title="School sign-up" allow="clipboard-write"></iframe>
+  <noscript><p>This page needs JavaScript. Turn it on in your browser settings, then reload.</p></noscript>
+  <script>
+    // Paste the Families deployment address from Apps Script between the quotes. It ends in /exec.
+    var APP_URL = 'PASTE_THE_FAMILIES_URL_HERE';
+
+    // Only an event code (e) or a family's private code (b) is passed along, stripped to safe characters.
+    function clean(v) { return String(v || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64); }
+    function appUrl(search, hash) {
+      var q = new URLSearchParams(search);
+      var h = new URLSearchParams(String(hash || '').replace(/^#/, ''));
+      var b = clean(h.get('b') || q.get('b'));
+      var e = clean(h.get('e') || q.get('e'));
+      return APP_URL + '?w=1' + (b ? '&b=' + b : e ? '&e=' + e : '');
+    }
+
+    // After a family signs up, the sign-up page sends their private code so the address bar and
+    // any bookmark keep it. Messages are only accepted from Google's Apps Script pages.
+    function onAppMessage(origin, data) {
+      if (!/^https:\/\/[a-z0-9-]+\.googleusercontent\.com$/.test(origin)) return false;
+      if (!data || data.type !== 'rs-url' || !/^[A-Za-z0-9_-]{1,64}$/.test(data.b || '')) return false;
+      history.replaceState(null, '', location.pathname + '#b=' + data.b);
+      return true;
+    }
+
+    var frame = document.getElementById('app');
+    if (/^https:\/\/script\.google\.com\/[A-Za-z0-9_.\/-]+\/exec$/.test(APP_URL)) {
+      frame.src = appUrl(location.search, location.hash);
+      window.addEventListener('message', function (ev) { onAppMessage(ev.origin, ev.data); });
+      window.addEventListener('hashchange', function () { frame.src = appUrl(location.search, location.hash); });
+    } else {
+      frame.remove();
+      var note = document.createElement('p');
+      note.textContent = 'Setup needed: put the Families deployment address in APP_URL inside this file.';
+      document.body.appendChild(note);
+    }
+  </script>
+</body>
+</html>
